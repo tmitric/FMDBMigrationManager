@@ -1,3 +1,9 @@
+## v1.2.1
+
+##### Bug Fixes
+
+* The podspec now depends on FMDB/common instead of FMDB (which implied FMDB/standard) so that it can be used with FMDB/standalone.
+
 ## v1.2.0
 
 ##### Enhancements
