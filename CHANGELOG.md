@@ -1,3 +1,9 @@
+## v1.2.2
+
+##### Bug Fixes
+
+* Remove the `-lsqlite3` library flag from the Podspec.
+
 ## v1.2.1
 
 ##### Bug Fixes
