@@ -3,7 +3,7 @@ PODS:
   - FMDB/common (2.3)
   - FMDB/standard (2.3):
     - FMDB/common
-  - FMDBMigrationManager (1.2.2):
+  - FMDBMigrationManager (1.3.0):
     - FMDB/common (~> 2.3)
 
 DEPENDENCIES:
@@ -18,6 +18,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Expecta: 03aabd0a89d8dea843baecb19a7fd7466a69a31d
   FMDB: 31ec26773c7f7b7890a6038235a1f2bbd933a7cb
-  FMDBMigrationManager: eb8a2c78646d05e88a284bbf5ac67e91ae8fcfe9
+  FMDBMigrationManager: adc6273c60ab51d434f56be0014b040a56d4211e
 
 COCOAPODS: 0.33.1

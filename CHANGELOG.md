@@ -1,3 +1,14 @@
+## v1.3.0
+
+##### Enhancements
+
+* Enable users to opt out of the dynamic migration class scanning via the `dynamicMigrationsEnabled` switch.
+* Memoize the computed list of migrations for efficiency.
+
+##### Bug Fixes
+
+* Explicitly close all FMDB result sets to avoid generating debug warnings.
+
 ## v1.2.2
 
 ##### Bug Fixes
