@@ -49,6 +49,12 @@
  */
 + (instancetype)managerWithDatabaseAtPath:(NSString *)path migrationsBundle:(NSBundle *)bundle;
 
+/**
+ @abstract Determines whether the receiver will perform a search for dynamically defined migrations. Default: `YES`.
+ @discussion When `YES` all classes will be enumerated to search for any that conform to the `FMDBMigrating` protocol.
+ */
+@property (nonatomic, assign) BOOL dynamicMigrationsEnabled;
+
 ///--------------------------------------------------
 /// @name Accessing Database Path & Migrations Bundle
 ///--------------------------------------------------

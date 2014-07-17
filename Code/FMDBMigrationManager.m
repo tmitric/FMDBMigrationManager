@@ -86,6 +86,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
     if (self) {
         _database = database;
         _migrationsBundle = migrationsBundle;
+        _dynamicMigrationsEnabled = YES;
         if (![database goodConnection]) {
             self.shouldCloseOnDealloc = YES;
             [database open];
@@ -181,11 +182,13 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
     }
     
     // Find all classes implementing FMDBMigrating
-    NSArray *conformingClasses = FMDBClassesConformingToProtocol(@protocol(FMDBMigrating));
-    for (Class migrationClass in conformingClasses) {
-        if ([migrationClass isSubclassOfClass:[FMDBFileMigration class]]) continue;
-        id<FMDBMigrating> migration = [migrationClass new];
-        [migrations addObject:migration];
+    if (self.dynamicMigrationsEnabled) {
+        NSArray *conformingClasses = FMDBClassesConformingToProtocol(@protocol(FMDBMigrating));
+        for (Class migrationClass in conformingClasses) {
+            if ([migrationClass isSubclassOfClass:[FMDBFileMigration class]]) continue;
+            id<FMDBMigrating> migration = [migrationClass new];
+            [migrations addObject:migration];
+        }
     }
     return [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
 }
