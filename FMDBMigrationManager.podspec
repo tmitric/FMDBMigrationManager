@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'FMDBMigrationManager'
-  s.version  = '1.3.0'
+  s.version  = '1.3.1'
   s.license  = 'Apache2'
   s.summary  = 'A SQLite database schema migration system for FMDB'
   s.homepage = 'https://github.com/layerhq/FMDBMigrationManager'
@@ -12,5 +12,5 @@ Pod::Spec.new do |s|
   s.dependency 'FMDB/common', '~> 2.3'
 
   s.ios.deployment_target = '7.0'
-  s.osx.deployment_target = '10.9'
+  s.osx.deployment_target = '10.8'
 end

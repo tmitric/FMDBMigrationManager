@@ -1,3 +1,9 @@
+## v1.3.1
+
+##### Enhancements
+
+* Lowered OS X deployment target to 10.8
+
 ## v1.3.0
 
 ##### Enhancements
