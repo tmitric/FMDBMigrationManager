@@ -60,8 +60,9 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 }
 
 @interface FMDBMigrationManager ()
-@property (nonatomic, strong) FMDatabase *database;
+@property (nonatomic) FMDatabase *database;
 @property (nonatomic, assign) BOOL shouldCloseOnDealloc;
+@property (nonatomic) NSArray *migrations;
 @end
 
 @implementation FMDBMigrationManager
@@ -170,6 +171,9 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (NSArray *)migrations
 {
+    // Memoize the migrations list
+    if (_migrations) return _migrations;
+    
     NSArray *migrationPaths = [self.migrationsBundle pathsForResourcesOfType:@"sql" inDirectory:nil];
     NSRegularExpression *migrationRegex = [NSRegularExpression regularExpressionWithPattern:FMDBMigrationFilenameRegexString options:0 error:nil];
     NSMutableArray *migrations = [NSMutableArray new];
@@ -190,7 +194,8 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
             [migrations addObject:migration];
         }
     }
-    return [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
+    _migrations = [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
+    return _migrations;
 }
 
 - (id<FMDBMigrating>)migrationForVersion:(uint64_t)version

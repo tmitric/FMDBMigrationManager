@@ -95,6 +95,7 @@
  @discussion The manager discovers migrations by analyzing all files that end in a .sql extension in the `migrationsBundle`
  and accumulating all classes that conform to the `FMDBMigrating` protocol. These migrations can then be sorted and applied
  to the target database.
+ @note The list of migrations is memoized for efficiency.
  */
 @property (nonatomic, readonly) NSArray *migrations;
 
