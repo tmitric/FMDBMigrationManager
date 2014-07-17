@@ -110,7 +110,8 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 {
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT name FROM sqlite_master WHERE type='table' AND name=?", @"schema_migrations"];
     if ([resultSet next]) {
-        return [resultSet stringForColumn:@"name"] != nil;
+        [resultSet close];
+        return YES;
     }
     return NO;
 }
@@ -130,21 +131,27 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 - (uint64_t)currentVersion
 {
     if (!self.hasMigrationsTable) return 0;
+    
+    uint64_t version = 0;
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT MAX(version) FROM schema_migrations"];
     if ([resultSet next]) {
-        return [resultSet unsignedLongLongIntForColumnIndex:0];
+        version = [resultSet unsignedLongLongIntForColumnIndex:0];
     }
-    return 0;
+    [resultSet close];
+    return version;;
 }
 
 - (uint64_t)originVersion
 {
     if (!self.hasMigrationsTable) return 0;
+    
+    uint64_t version = 0;
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT MIN(version) FROM schema_migrations"];
     if ([resultSet next]) {
-        return [resultSet unsignedLongLongIntForColumnIndex:0];
+        version = [resultSet unsignedLongLongIntForColumnIndex:0];
     }
-    return 0;
+    [resultSet close];
+    return version;
 }
 
 - (NSArray *)appliedVersions
@@ -157,6 +164,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         uint64_t version = [resultSet unsignedLongLongIntForColumnIndex:0];
         [versions addObject:@(version)];
     }
+    [resultSet close];
     return [versions sortedArrayUsingSelector:@selector(compare:)];
 }
 
