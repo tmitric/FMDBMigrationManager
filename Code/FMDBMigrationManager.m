@@ -231,7 +231,10 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         [self.database beginTransaction];
         
         uint64_t migrationVersion = [migrationVersionNumber unsignedLongLongValue];
-        if (migrationVersion > version) break;
+        if (migrationVersion > version) {
+            [self.database commit];
+            break;
+        }
         id<FMDBMigrating> migration = [self migrationForVersion:migrationVersion];
         success = [migration migrateDatabase:self.database error:error];
         if (!success) {

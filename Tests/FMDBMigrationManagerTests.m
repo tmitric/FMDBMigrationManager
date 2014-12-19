@@ -337,6 +337,9 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(error).to.beNil();
     expect(manager.hasMigrationsTable).to.beTruthy();
     expect(manager.currentVersion).to.equal(201406063106474);
+    
+    // Also check if the the database is not in transaction
+    expect(manager.database.inTransaction).to.beFalsy();
 }
 
 - (void)testThatMigrationCanBeCancelledViaProgressBlock
