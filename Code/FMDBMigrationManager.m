@@ -63,6 +63,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 @property (nonatomic) FMDatabase *database;
 @property (nonatomic, assign) BOOL shouldCloseOnDealloc;
 @property (nonatomic) NSArray *migrations;
+@property (nonatomic) NSMutableArray *externalMigrations;
 @end
 
 @implementation FMDBMigrationManager
@@ -88,6 +89,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         _database = database;
         _migrationsBundle = migrationsBundle;
         _dynamicMigrationsEnabled = YES;
+        _externalMigrations = [NSMutableArray new];
         if (![database goodConnection]) {
             self.shouldCloseOnDealloc = YES;
             [database open];
@@ -177,6 +179,19 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
     return [pendingVersions sortedArrayUsingSelector:@selector(compare:)];
 }
 
+- (void)addMigration:(id<FMDBMigrating>)migration
+{
+    NSParameterAssert(migration);
+    [self.externalMigrations addObject:migration];
+    
+    // Append to the existing list if already computed
+    if (_migrations) {
+        NSMutableArray *migrations = [_migrations mutableCopy];
+        [migrations addObject:migration];
+        _migrations = [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
+    }
+}
+
 - (NSArray *)migrations
 {
     // Memoize the migrations list
@@ -202,6 +217,11 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
             [migrations addObject:migration];
         }
     }
+    
+    // Append any externally added migrations
+    [migrations addObjectsFromArray:self.externalMigrations];
+    
+    // Sort into our final set
     _migrations = [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
     return _migrations;
 }

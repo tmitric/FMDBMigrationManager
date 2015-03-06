@@ -90,7 +90,7 @@
 ///---------------------------
 
 /**
- @abstract Returns all migrations discoverable by the receiver. Each object returned conforms to the `FMDBMigrating` protocol. The
+ @abstract Returns all migrations discovered by the receiver. Each object returned conforms to the `FMDBMigrating` protocol. The
  array is returned in ascending order by version.
  @discussion The manager discovers migrations by analyzing all files that end in a .sql extension in the `migrationsBundle`
  and accumulating all classes that conform to the `FMDBMigrating` protocol. These migrations can then be sorted and applied
@@ -124,6 +124,18 @@
  @return A migration with the specified named or `nil` if none could be found.
  */
 - (id<FMDBMigrating>)migrationForName:(NSString *)name;
+
+///-------------------------
+/// @name Adding a Migration
+///-------------------------
+
+/**
+ @abstract Adds a migration to the receiver's list.
+ @discussion This method can be used to append code based migrations to the set if you do not wish to use dynamic migration discovery. If
+ the migration last has been previously computed, adding a migration will recompute the list.
+ @param migration The migration to add.
+ */
+- (void)addMigration:(id<FMDBMigrating>)migration;
 
 ///------------------------------------
 /// @name Managing the Migrations Table

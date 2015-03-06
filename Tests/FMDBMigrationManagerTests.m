@@ -163,6 +163,38 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.needsMigration).to.beFalsy();
 }
 
+- (void)testAddingMigrationBeforeMemoization
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
+    manager.dynamicMigrationsEnabled = NO;
+    FMDBTestObjectMigration *migration = [FMDBTestObjectMigration new];
+    [manager addMigration:migration];
+    NSArray *migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(3);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table", @"My Object Migration"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463, @201499000000000 ]);
+}
+
+- (void)testAddingMigrationAfterMemoization
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
+    manager.dynamicMigrationsEnabled = NO;
+    
+    // Load it once
+    NSArray *migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(2);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463 ]);
+    
+    // Add a migration and verify its reflected
+    FMDBTestObjectMigration *migration = [FMDBTestObjectMigration new];
+    [manager addMigration:migration];
+    migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(3);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table", @"My Object Migration"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463, @201499000000000 ]);
+}
+
 - (void)testGettingMigrations
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
