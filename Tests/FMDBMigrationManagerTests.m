@@ -452,16 +452,6 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect([manager.migrations valueForKey:@"version"]).to.equal(@[ @2, @12345, @201406063548463, @201499000000000 ]);
 }
 
-- (void)testAddMigrationWithInvalidObjectFails
-{
-    FMDatabase *database = [FMDatabase databaseWithPath:nil];
-    [database open];
-    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabase:database migrationsBundle:FMDBMigrationsTestBundle()];
-    expect(^{
-        [manager addMigration:(id)[NSObject new]];
-    }).to.raiseWithReason(NSInvalidArgumentException, @"Failed to add a migration because `migration` object doesn't conform to the `FMDBMigrating` protocol.");
-}
-
 - (void)testAddMigrationsWithInvalidObjectFails
 {
     FMDatabase *database = [FMDatabase databaseWithPath:nil];

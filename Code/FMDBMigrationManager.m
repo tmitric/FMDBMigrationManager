@@ -182,9 +182,6 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 - (void)addMigration:(id<FMDBMigrating>)migration
 {
     NSParameterAssert(migration);
-    if (![migration conformsToProtocol:@protocol(FMDBMigrating)]) {
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Failed to add a migration because `migration` object doesn't conform to the `FMDBMigrating` protocol." userInfo:nil];
-    }
     [self addMigrationsAndSortByVersion:@[ migration ]];
 }
 
