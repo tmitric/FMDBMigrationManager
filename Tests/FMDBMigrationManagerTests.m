@@ -175,6 +175,18 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463, @201499000000000 ]);
 }
 
+- (void)testAddingMigrationsBeforeMemoization
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
+    manager.dynamicMigrationsEnabled = NO;
+    FMDBTestObjectMigration *migration = [FMDBTestObjectMigration new];
+    [manager addMigrations:@[ migration ]];
+    NSArray *migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(3);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table", @"My Object Migration"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463, @201499000000000 ]);
+}
+
 - (void)testAddingMigrationAfterMemoization
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
@@ -189,6 +201,26 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     // Add a migration and verify its reflected
     FMDBTestObjectMigration *migration = [FMDBTestObjectMigration new];
     [manager addMigration:migration];
+    migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(3);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table", @"My Object Migration"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463, @201499000000000 ]);
+}
+
+- (void)testAddingMigrationsAfterMemoization
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
+    manager.dynamicMigrationsEnabled = NO;
+    
+    // Load it once
+    NSArray *migrations = manager.migrations;
+    expect(migrations).to.haveCountOf(2);
+    expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table"]);
+    expect([migrations valueForKey:@"version"]).to.equal(@[@201406063106474, @201406063548463 ]);
+    
+    // Add a migration and verify its reflected
+    FMDBTestObjectMigration *migration = [FMDBTestObjectMigration new];
+    [manager addMigrations:@[ migration ]];
     migrations = manager.migrations;
     expect(migrations).to.haveCountOf(3);
     expect([migrations valueForKey:@"name"]).to.equal(@[@"create_mb-demo-schema", @"create_add_second_table", @"My Object Migration"]);
@@ -418,6 +450,31 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:alternateNamesBundle];
     expect([manager.migrations valueForKey:@"name"]).to.equal(@[ @"CamelCaseShouldWork", [NSNull null], @"This Is Another Name", @"My Object Migration" ]);
     expect([manager.migrations valueForKey:@"version"]).to.equal(@[ @2, @12345, @201406063548463, @201499000000000 ]);
+}
+
+- (void)testAddMigrationWithInvalidObjectFails
+{
+    FMDatabase *database = [FMDatabase databaseWithPath:nil];
+    [database open];
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabase:database migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(^{
+        [manager addMigration:(id)[NSObject new]];
+    }).to.raiseWithReason(NSInvalidArgumentException, @"Failed to add a migration because `migration` object doesn't conform to the `FMDBMigrating` protocol.");
+}
+
+- (void)testAddMigrationsWithInvalidObjectFails
+{
+    FMDatabase *database = [FMDatabase databaseWithPath:nil];
+    [database open];
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabase:database migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(^{
+        [manager addMigrations:(id)[NSObject new]];
+    }).to.raiseWithReason(NSInvalidArgumentException, @"Failed to add migrations because `migrations` argument is not an array.");
+
+    NSArray *bogusMigrations = @[ @(1), @(2) ];
+    expect(^{
+        [manager addMigrations:bogusMigrations];
+    }).to.raiseWithReason(NSInvalidArgumentException, @"Failed to add migrations because an object in `migrations` array doesn't conform to the `FMDBMigrating` protocol.");
 }
 
 @end

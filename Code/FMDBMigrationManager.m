@@ -182,6 +182,9 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 - (void)addMigration:(id<FMDBMigrating>)migration
 {
     NSParameterAssert(migration);
+    if (![migration conformsToProtocol:@protocol(FMDBMigrating)]) {
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Failed to add a migration because `migration` object doesn't conform to the `FMDBMigrating` protocol." userInfo:nil];
+    }
     [self.externalMigrations addObject:migration];
     
     // Append to the existing list if already computed
@@ -189,6 +192,27 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         NSMutableArray *migrations = [_migrations mutableCopy];
         [migrations addObject:migration];
         _migrations = [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
+    }
+}
+
+- (void)addMigrations:(NSArray *)migrations
+{
+    NSParameterAssert(migrations);
+    if (![migrations isKindOfClass:[NSArray class]]) {
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Failed to add migrations because `migrations` argument is not an array." userInfo:nil];
+    }
+    for (id<NSObject> migration in migrations) {
+        if (![migration conformsToProtocol:@protocol(FMDBMigrating)]) {
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Failed to add migrations because an object in `migrations` array doesn't conform to the `FMDBMigrating` protocol." userInfo:nil];
+        }
+    }
+    [self.externalMigrations addObjectsFromArray:migrations];
+
+    // Append to the existing list if already computed
+    if (_migrations) {
+        NSMutableArray *currentMigrations = [_migrations mutableCopy];
+        [currentMigrations addObjectsFromArray:migrations];
+        _migrations = [currentMigrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
     }
 }
 
