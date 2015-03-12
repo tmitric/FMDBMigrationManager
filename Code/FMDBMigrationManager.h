@@ -137,6 +137,14 @@
  */
 - (void)addMigration:(id<FMDBMigrating>)migration;
 
+/**
+ @abstract Adds migrations from the array to the receiver's list.
+ @discussion This method can be used to append code based migrations to the set if you do not wish to use dynamic migration discovery. If
+ the migration last has been previously computed, adding migrations will recompute the list.
+ @param migrations An array of objects conforming to `FMDBMigrating` protocol.
+ */
+- (void)addMigrations:(NSArray *)migrations;
+
 ///------------------------------------
 /// @name Managing the Migrations Table
 ///------------------------------------
