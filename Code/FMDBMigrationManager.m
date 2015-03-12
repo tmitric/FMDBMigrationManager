@@ -319,10 +319,14 @@ static BOOL FMDBMigrationScanMetadataFromPath(NSString *path, uint64_t *version,
     }
     NSString *migrationName = [path lastPathComponent];
     NSTextCheckingResult *result = [regex firstMatchInString:migrationName options:0 range:NSMakeRange(0, [migrationName length])];
-    if ([result numberOfRanges] != 3) return NO;
+    if ([result numberOfRanges] != 3) {
+        return NO;
+    }
     NSString *versionString = [migrationName substringWithRange:[result rangeAtIndex:1]];
-    NSScanner *scanner = [NSScanner scannerWithString:versionString];
-    [scanner scanUnsignedLongLong:version];
+    if (!versionString) {
+        return NO;
+    }
+    *version = strtoull([versionString UTF8String], NULL, 10);
     NSRange range = [result rangeAtIndex:2];
     *name = (range.length) ? [migrationName substringWithRange:[result rangeAtIndex:2]] : nil;
     return YES;
