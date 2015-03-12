@@ -18,4 +18,9 @@ XCTasks::TestTask.new(:test) do |t|
   end
 end
 
+desc "Release a new version of FMDBMigrationManager"
+task :release do
+  system("pod trunk push --use-libraries FMDBMigrationManager.podspec")
+end
+
 task default: 'test'
