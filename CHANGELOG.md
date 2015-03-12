@@ -1,3 +1,21 @@
+## v1.3.4
+
+##### Bug Fixes
+
+* Now compatible with OS X 10.8 by removing usage of `- [NSScanner scanUnsignedLongLong:]`.
+
+## v1.3.3
+
+##### Enhancements
+
+* Added support for adding code based migration externally to the manager.
+
+## v1.3.2
+
+##### Enhancements
+
+* Fix issue where migrating to a specific version would leave migration open.
+
 ## v1.3.1
 
 ##### Enhancements
