@@ -20,7 +20,7 @@ end
 
 desc "Release a new version of FMDBMigrationManager"
 task :release do
-  system("pod trunk push --use-libraries FMDBMigrationManager.podspec")
+  system("pod trunk push --allow-warnings FMDBMigrationManager.podspec")
 end
 
 task default: 'test'
