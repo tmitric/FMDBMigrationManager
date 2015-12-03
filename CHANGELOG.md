@@ -1,3 +1,9 @@
+## v1.4.0
+
+##### Enhancements
+
+* The library is now compatible with FMDB Standalone or Standard flavors from version 2.3.x.
+
 ## v1.3.4
 
 ##### Bug Fixes
